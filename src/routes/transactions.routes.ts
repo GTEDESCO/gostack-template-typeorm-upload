@@ -5,7 +5,7 @@ import { getCustomRepository } from 'typeorm';
 import TransactionsRepository from '../repositories/TransactionsRepository';
 import CreateTransactionService from '../services/CreateTransactionService';
 import DeleteTransactionService from '../services/DeleteTransactionService';
-// import ImportTransactionsService from '../services/ImportTransactionsService';
+import ImportTransactionsService from '../services/ImportTransactionsService';
 
 import uploadConfig from '../config/upload';
 
@@ -51,7 +51,13 @@ transactionsRouter.post(
   '/import',
   upload.single('file'),
   async (request, response) => {
-    response.send();
+    const { path } = request.file;
+
+    const importTransaction = new ImportTransactionsService();
+
+    const transactions = await importTransaction.execute(path);
+
+    return response.json(transactions);
   },
 );
 
