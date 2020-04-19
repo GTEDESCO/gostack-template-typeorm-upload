@@ -16,18 +16,37 @@ class ImportTransactionsService {
 
     const createTransaction = new CreateTransactionService();
 
-    const transactions = await Promise.all(
-      csvData.map(async ({ title, type, value, category }) => {
-        const transaction = await createTransaction.execute({
-          title,
-          type,
-          value,
-          category,
-        });
+    const transactionsIncome = await Promise.all(
+      csvData
+        .filter(({ type }) => type === 'income')
+        .map(async ({ title, type, value, category }) => {
+          const transaction = await createTransaction.execute({
+            title,
+            type,
+            value,
+            category,
+          });
 
-        return transaction;
-      }),
+          return transaction;
+        }),
     );
+
+    const transactionsOutcome = await Promise.all(
+      csvData
+        .filter(({ type }) => type === 'outcome')
+        .map(async ({ title, type, value, category }) => {
+          const transaction = await createTransaction.execute({
+            title,
+            type,
+            value,
+            category,
+          });
+
+          return transaction;
+        }),
+    );
+
+    const transactions = [...transactionsIncome, ...transactionsOutcome];
 
     return transactions;
   }
